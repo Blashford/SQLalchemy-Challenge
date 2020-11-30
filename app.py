@@ -90,7 +90,13 @@ def starty(start):
     session = Session(engine)
     result = session.query(func.min(Measure.tobs), func.avg(Measure.tobs), func.max(Measure.tobs)).\
         filter(Measure.date >= start).all()
+    min_date = session.query(Measure.date).order_by(Measure.date).first()
+    max_date = session.query(Measure.date).order_by(Measure.date.desc()).first()
     session.close()
+    
+    if (start > max_date[0]) or (start < min_date[0]):
+        return f"The start date you have input is not in the database, the earliest date is {min_date[0]} and the latest date is {max_date[0]}"
+    
     listy = []
     for minnie, avg, maxy in result:
         dicty = {}
@@ -106,7 +112,13 @@ def endy(start, end):
     session = Session(engine)
     result = session.query(func.min(Measure.tobs), func.avg(Measure.tobs), func.max(Measure.tobs)).\
         filter(Measure.date >= start).filter(Measure.date <= end).all()
+    min_date = session.query(Measure.date).order_by(Measure.date).first()
+    max_date = session.query(Measure.date).order_by(Measure.date.desc()).first()
     session.close()
+
+    if (start > max_date[0]) or (start < min_date[0]) or (end > max_date[0]) or (end < min_date[0]):
+        return f"The start or end date you have input is not in the database, the earliest date is {min_date[0]} and the latest date is {max_date[0]}"
+
     listy = []
     for minnie, avg, maxy in result:
         dicty = {}
